@@ -1,139 +1,185 @@
 <img width="2816" height="1536" alt="Gemini_Generated_Image_633pn6633pn6633p" src="https://github.com/user-attachments/assets/4fce6b55-2f76-427b-9093-3b1a1817e419" />🚀 Cloud GCS Dashboard
 
-A lightweight real-time Ground Control Dashboard that receives MAVLink telemetry over UDP, converts it to JSON in a FastAPI WebSocket backend, and streams live data to a React frontend.
+🚀 Cloud GCS Dashboard
 
-📌 Features
+A lightweight real-time Ground Control Dashboard powered by MAVLink + FastAPI + React.
 
-Real-time telemetry updates (altitude, speed, heading, mode, armed state)
+This project receives PX4 MAVLink telemetry over UDP, parses it in a FastAPI WebSocket backend, and streams live telemetry to a React dashboard with smooth real-time updates.
 
-MAVLink over UDP → backend parser
+✨ Features
 
-WebSocket live updates to React UI
+📡 Real-time telemetry: altitude, ground speed, heading, mode, armed state
 
-Automatic reconnect + heartbeat ping system
+🔌 MAVLink → UDP → FastAPI → WebSocket → React
 
-Clean dashboard UI with flight cards + compass
+🔄 Automatic WebSocket reconnect + heartbeat system
 
-Works with PX4 SITL or any MAVLink sender
+🧭 Dynamic compass, flight cards, and status indicators
+
+🛠 Works with PX4 SITL or any MAVLink-enabled autopilot
+
+🧪 Built-in telemetry test mode (simulate data easily)
 
 🧰 Tech Stack
 Protocols
 
-MAVLink (PX4 → Backend)
+MAVLink (PX4 → backend)
 
 UDP (telemetry transport)
 
-WebSocket (Backend → React real-time data)
+WebSocket (real-time UI updates)
 
-HTTP REST (backend metadata endpoints)
+HTTP REST (backend metadata)
 
 Frameworks
 
-FastAPI backend (Python)
+⚙️ FastAPI — backend + WebSocket server
 
-React frontend
+⚛️ React — real-time dashboard UI
 
-WebSocket API for streaming
+🐍 Python — MAVLink parser
 
-Node / NPM for UI build
+🌐 Node / NPM — frontend tooling
 
-🛠️ Project Structure
+📁 Project Structure
 project-root/
-   ├── backend/
-   │    ├── main.py
-   │    ├── telemetry_parser.py
-   │    ├── requirements.txt
-   │    └── ...
-   ├── frontend/
-   │    ├── src/App.js
-   │    ├── src/index.css
-   │    └── package.json
-   └── README.md
+├── backend/
+│   ├── main.py
+│   ├── telemetry_parser.py
+│   ├── requirements.txt
+│   └── ...
+├── frontend/
+│   ├── src/App.js
+│   ├── src/index.css
+│   └── package.json
+└── README.md
 
-🔧 Setup Instructions
+🚀 Getting Started
 1️⃣ Clone the repository
 git clone https://github.com/Avishkar014/GCS_With_MavLink.git
-cd cloud-gcs-dashboard
+cd GCS_With_MavLink
 
 🛰 Backend Setup (FastAPI + WebSocket)
-2️⃣ Install Python dependencies
+2️⃣ Install dependencies
 cd backend
 python -m venv venv
-source venv/bin/activate      # macOS/Linux
-venv\Scripts\activate         # Windows
+
+# macOS / Linux
+source venv/bin/activate
+
+# Windows
+venv\Scripts\activate
+
+
+Install required packages:
 
 pip install -r requirements.txt
 
 3️⃣ Start FastAPI server
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
+Backend exposes:
 
-Backend now listens on:
-
-UDP Telemetry: udp://127.0.0.1:14540
+UDP Telemetry: udp://0.0.0.0:14540
 
 WebSocket: ws://127.0.0.1:8000/ws/telemetry
 
 REST API: http://127.0.0.1:8000
 
-💻 Frontend Setup (React UI)
-4️⃣ Install dependencies
+💻 Frontend Setup (React)
+4️⃣ Install UI dependencies
 cd ../frontend
 npm install
 
-5️⃣ Run the React app
-npm start
+5️⃣ Start React app
+npm run dev
 
 
-React will open on:
+Vite opens at:
 
-http://localhost:3000
+👉 http://localhost:5173
 
-🎮 Using PX4 SITL
-6️⃣ Start PX4 SITL (example)
-make px4_sitl gazebo
+🐧 WSL Setup (Recommended for PX4 SITL)
+Install WSL
+wsl --install
 
 
-Or for Windows:
+Update environment:
 
-.\Tools\simulation\run_sitl.bat px4_sitl_default none
+sudo apt update && sudo apt upgrade -y
 
-7️⃣ Make PX4 send MAVLink to your backend
 
-Run:
+Install required tools:
+
+sudo apt install git python3 python3-pip pipx build-essential -y
+
+
+Enable optional GUI apps (Windows 11 auto-supports):
+
+sudo apt install x11-apps
+
+✈️ PX4 SITL Setup (WSL)
+1️⃣ Clone PX4 Autopilot
+git clone https://github.com/PX4/PX4-Autopilot.git --recursive
+cd PX4-Autopilot
+
+2️⃣ Install dependencies
+bash ./Tools/setup/ubuntu.sh
+
+3️⃣ Build SITL
+make px4_sitl_default
+
+4️⃣ Run SITL Simulator
+JMAVSim:
+make px4_sitl_default jmavsim
+
+Gazebo:
+make px4_sitl_default gazebo
+
+📡 Connecting PX4 SITL to Your Backend
+
+PX4 must stream MAVLink telemetry to your backend:
 
 mavlink start -u 14540 -r 50
 
 
-Your backend will start receiving telemetry immediately.
+If needed, ensure forwarding:
 
+param set MAV_0_FORWARD 1
+
+
+Once started, your backend begins receiving live telemetry instantly.
 
 🧪 Testing Telemetry Without PX4
 
-Send fake MAVLink-like data:
+Simulate telemetry using websocat:
 
 echo '{"type":"telemetry","data":{"altitude":10,"ground_speed":3,"heading":90}}' \
-     | websocat ws://127.0.0.1:8000/ws/telemetry
+| websocat ws://127.0.0.1:8000/ws/telemetry
 
 🚦 Status Indicators
 Status	Meaning
-🟢 Connected	WebSocket active
-🟡 Connecting	Trying to connect
-🔴 Disconnected	No live data
-📁 Environment Variables (optional)
+🟢	WebSocket Connected
+🟡	Trying to Reconnect
+🔴	No Live Telemetry
+🔧 Environment Variables
+
+(Optional for production)
+
 WS_URL=ws://127.0.0.1:8000/ws/telemetry
 UDP_PORT=14540
 
-🐞 Debug Tools
+🐞 Debug Tools Included
 
-The UI shows:
+Raw WebSocket payload viewer
 
-raw incoming WS message
+Packet counter
 
-message count
+Last ping timestamp
 
-last time backend responded
+WebSocket health monitor
 
 📄 License
 
+This project is released under the MIT License.
 MIT License
